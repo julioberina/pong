@@ -13,12 +13,6 @@ class Array # Add math operations for vectors
     self.length.times { |n| result << ((self[n] + vec[n]) / 2.0) }
     result
   end
-
-  def butlast # Regular array operation, returns all but the last element
-    result = self.dup
-    result.pop
-    result
-  end
 end
 
 class GameWindow < Gosu::Window
@@ -26,10 +20,14 @@ class GameWindow < Gosu::Window
     super 800, 600
     self.caption = "Pong"
     @player_paddle = [10, 10, 30, 10, 10, 131, 30, 131]
-    @computer_paddle = [770, 10, 790, 10, 770, 131, 790, 131]
+    @computer_paddle = [770, 60, 790, 60, 770, 181, 790, 181]
     @pong_ball = [380, 280, 10]
     @moving = [false, false] # 0 = moving up, 1 = moving down
     @ball_v = [0, 0]
+    @pscore = 0
+    @cscore = 0
+    @player_score = Gosu::Image.from_text(self, @pscore.to_s, Gosu.default_font_name, 45)
+    @computer_score = Gosu::Image.from_text(self, @cscore.to_s, Gosu.default_font_name, 45)
   end
 
   def below_boundary?; return (@player_paddle[1] > 0) end
@@ -109,6 +107,8 @@ class GameWindow < Gosu::Window
   end
 
   def draw
+    @player_score.draw(10.0, 10.0, 0) # Draw player score
+    @computer_score.draw(770.0, 10.0, 0) # Draw computer score
     draw_quad(@player_paddle[0], @player_paddle[1], Gosu::Color::WHITE,
               @player_paddle[2], @player_paddle[3], Gosu::Color::WHITE,
               @player_paddle[4], @player_paddle[5], Gosu::Color::WHITE,
