@@ -78,21 +78,33 @@ class GameWindow < Gosu::Window
     # Ball-to-player_paddle collision checking
     if (@pong_ball[0] - @pong_ball[2]) <= @player_paddle[2] # Horizontal collision
       if @pong_ball[1] >= @player_paddle[1] and @pong_ball[1] <= (@player_paddle[1] + 60) # Vertical collision (top to middle)
-        angle = (@pong_ball[1] - @player_paddle[1]) * PI / 180.0
-        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])]
+        angle = (60 - (@pong_ball[1] - @player_paddle[1])) * PI / 180.0
+        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
         force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * (-1) * sin(angle))]
         @ball_v = force_v.resultant ball_v
-      elsif @pong_ball[1] > (@player_paddle[1] + 60) and @pong_ball[1] <= @player_paddle[5] # Vertical collision (middle to bottom)
-        angle = ((@pong_ball[1] + 270) - @player_paddle[1]) * PI / 180.0
-        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])]
-        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * (-1) * sin(angle))]
+      elsif @pong_ball[1] > (@player_paddle[1] + 60) and @pong_ball[1] <= @player_paddle[5] # Vertical collision (mid to bottom)
+        angle = (360 - (@pong_ball[1] - (@player_paddle[1] + 60))) * PI / 180.0
+        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
+        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))]
         @ball_v = force_v.resultant ball_v
       end
     end
 
+    computer_ai
+    
     # Ball-to-computer_paddle collision checking
-    if (@pong_ball[0] + @pong_ball[2])
-      
+    if (@pong_ball[0] + @pong_ball[2]) >= @computer_paddle[0] # Horizontal collision
+      if @pong_ball[1] >= @computer_paddle[1] and @pong_ball[1] <= (@computer_paddle[1] + 60) # Vertical collision (top to middle)
+        angle = (120 + (@pong_ball[1] - @computer_paddle[1])) * PI / 180.0
+        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
+        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * (-1) * sin(angle))]
+        @ball_v = force_v.resultant ball_v
+      elsif @pong_ball[1] > (@computer_paddle[1] + 60) and @pong_ball[1] <= @computer_paddle[5] # Vertical collision (mid to bottom)
+        angle = (180 + (@pong_ball[1] - (@computer_paddle[1] + 60))) * PI / 180.0
+        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
+        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))]
+        @ball_v = force_v.resultant ball_v
+      end
     end
   end
 
