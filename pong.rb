@@ -81,7 +81,7 @@ class GameWindow < Gosu::Window
         force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * (-1) * sin(angle))]
         @ball_v = force_v.resultant ball_v
       elsif @pong_ball[1] > (@player_paddle[1] + 60) and @pong_ball[1] <= @player_paddle[5] # Vertical collision (mid to bottom)
-        angle = (360 - (@pong_ball[1] - (@player_paddle[1] + 60))) * PI / 180.0
+        angle = ((@pong_ball[1] - @player_paddle[1]) - 60) * PI / 180.0
         ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
         force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))]
         @ball_v = force_v.resultant ball_v
