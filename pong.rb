@@ -19,8 +19,8 @@ class GameWindow < Gosu::Window
   def initialize
     super 800, 600
     self.caption = "Pong"
-    @player_paddle = [10, 10, 30, 10, 10, 131, 30, 131]
-    @computer_paddle = [770, 60, 790, 60, 770, 181, 790, 181]
+    @player_paddle = [10, 10, 30, 10, 10, 130, 30, 130]
+    @computer_paddle = [770, 60, 790, 60, 770, 180, 790, 180]
     @pong_ball = [380, 280, 10]
     @moving = [false, false] # 0 = moving up, 1 = moving down
     @ball_v = [0, 0]
@@ -75,16 +75,11 @@ class GameWindow < Gosu::Window
 
     # Ball-to-player_paddle collision checking
     if (@pong_ball[0] - @pong_ball[2]) <= @player_paddle[2] # Horizontal collision
-      if @pong_ball[1] >= @player_paddle[1] and @pong_ball[1] <= (@player_paddle[1] + 60) # Vertical collision (top to middle)
-        angle = (60 - (@pong_ball[1] - @player_paddle[1])) * PI / 180.0
+      if @pong_ball[1] >= @player_paddle[1] and @pong_ball[1] <= @player_paddle[5] # Vertical collision
+        angle = (@pong_ball[1] - @player_paddle[1] - 70) * PI / 180.0 # Get angle of deflection in radians
         ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
-        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * (-1) * sin(angle))]
-        @ball_v = force_v.resultant ball_v
-      elsif @pong_ball[1] > (@player_paddle[1] + 60) and @pong_ball[1] <= @player_paddle[5] # Vertical collision (mid to bottom)
-        angle = ((@pong_ball[1] - @player_paddle[1]) - 60) * PI / 180.0
-        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
-        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))]
-        @ball_v = force_v.resultant ball_v
+        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))] # Calculate force vector
+        @ball_v = force_v.resultant ball_v # average out the ball and force vector
       end
     end
 
@@ -92,16 +87,11 @@ class GameWindow < Gosu::Window
     
     # Ball-to-computer_paddle collision checking
     if (@pong_ball[0] + @pong_ball[2]) >= @computer_paddle[0] # Horizontal collision
-      if @pong_ball[1] >= @computer_paddle[1] and @pong_ball[1] <= (@computer_paddle[1] + 60) # Vertical collision (top to middle)
-        angle = (120 + (@pong_ball[1] - @computer_paddle[1])) * PI / 180.0
+      if @pong_ball[1] >= @computer_paddle[1] and @pong_ball[1] <= @computer_paddle[5] # Vertical collision
+        angle = (@pong_ball[1] - @computer_paddle[1] + 120.0) * PI / 180.0 # Get angle of deflection in radians
         ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
-        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * (-1) * sin(angle))]
-        @ball_v = force_v.resultant ball_v
-      elsif @pong_ball[1] > (@computer_paddle[1] + 60) and @pong_ball[1] <= @computer_paddle[5] # Vertical collision (mid to bottom)
-        angle = (180 + (@pong_ball[1] - (@computer_paddle[1] + 60))) * PI / 180.0
-        ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
-        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))]
-        @ball_v = force_v.resultant ball_v
+        force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))] # Calculate force vector
+        @ball_v = force_v.resultant ball_v # average out the ball and force vector
       end
     end
   end
