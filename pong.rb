@@ -1,6 +1,8 @@
 require "gosu"
 include Math
 
+# blah blah blah
+
 class Array # Add math operations for vectors
   def magnitude
     result = 0
