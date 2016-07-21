@@ -23,6 +23,7 @@ class GameWindow < Gosu::Window
     @computer_paddle = [770, 60, 790, 60, 770, 180, 790, 180]
     @pong_ball = [380, 280, 10]
     @moving = [false, false] # 0 = moving up, 1 = moving down
+    @active = [false, false] # 0 = moving up, 1 = moving down
     @ball_v = [0, 0]
     @pscore = 0
     @cscore = 0
@@ -32,7 +33,9 @@ class GameWindow < Gosu::Window
 
   def below_boundary?; return (@player_paddle[1] > 0) end
   def above_boundary?; return (@player_paddle[5] < 600) end
-
+  def below_surface?; return (@computer_paddle[1] > 0) end
+  def above_surface?; return (@computer_paddle[5] < 600) end
+  
   def button_down id
     if id == Gosu::KbW
       @moving[0] = true
@@ -51,7 +54,26 @@ class GameWindow < Gosu::Window
   end
 
   def computer_ai
-    # Coming soon...
+    if @active[0] and below_surface?
+      1.step(7, 2) { |x| @computer_paddle[x] -= 5 }
+    elsif @active[1] and above_surface?
+      1.step(7, 2) { |x| @computer_paddle[x] += 5 }
+    end
+
+    # Computer paddle tracks ball movement
+    if (@computer_paddle[1] + 60) > @pong_ball[1]
+      # Move up
+      @active[0] = true
+      @active[1] = false
+    elsif (@computer_paddle[1] + 60) < @pong_ball[1]
+      # Move down
+      @active[0] = false
+      @active[1] = true
+    else
+      # Stand still
+      @active[0] = false
+      @active[1] = false
+    end
   end
 
   def update
@@ -62,28 +84,32 @@ class GameWindow < Gosu::Window
       1.step(7, 2) { |x| @player_paddle[x] += 5 }
     end
 
+    computer_ai
+
     # Initial and recurring ball movement
-    if  @ball_v == [0, 0] then @ball_v = [-5, 0] end
+    if @ball_v == [0, 0] then @ball_v = [-5, 0] end
     2.times { |n| @pong_ball[n] += @ball_v[n] }
 
     # Ball-to-wall collision checking
     if @pong_ball[1] < 10 or @pong_ball[1] > 590
       @ball_v[1] = @ball_v[1] * (-1)
-    elsif @pong_ball[0] < 10 or @pong_ball[0] > 790
-      @ball_v[0] = @ball_v[0] * (-1)
+    elsif @pong_ball[0] < 5 # Computer scores
+      @cscore += 1
+      @ball_v = [0, 0]
+    elsif @pong_ball[0] > 795 # Player scores
+      @pscore += 1
+      @ball_v = [0, 0]
     end
 
     # Ball-to-player_paddle collision checking
     if (@pong_ball[0] - @pong_ball[2]) <= @player_paddle[2] # Horizontal collision
       if @pong_ball[1] >= @player_paddle[1] and @pong_ball[1] <= @player_paddle[5] # Vertical collision
-        angle = (@pong_ball[1] - @player_paddle[1] - 70) * PI / 180.0 # Get angle of deflection in radians
+        angle = (@pong_ball[1] - @player_paddle[1] - 60) * PI / 180.0 # Get angle of deflection in radians
         ball_v = [((-1) * @ball_v[0]), ((-1) * @ball_v[1])] # Invert pong ball vector
         force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))] # Calculate force vector
         @ball_v = force_v.resultant ball_v # average out the ball and force vector
       end
     end
-
-    computer_ai
     
     # Ball-to-computer_paddle collision checking
     if (@pong_ball[0] + @pong_ball[2]) >= @computer_paddle[0] # Horizontal collision
@@ -93,6 +119,17 @@ class GameWindow < Gosu::Window
         force_v = [((ball_v.magnitude + 2) * cos(angle)), ((ball_v.magnitude + 2) * sin(angle))] # Calculate force vector
         @ball_v = force_v.resultant ball_v # average out the ball and force vector
       end
+    end
+
+    # Scoreboard update
+    if @pong_ball[0] < 5
+      @player_score = Gosu::Image.from_text(self, @pscore.to_s, Gosu.default_font_name, 45)
+      @computer_score = Gosu::Image.from_text(self, @cscore.to_s, Gosu.default_font_name, 45)
+      @pong_ball = [380, 280, 10]
+    elsif @pong_ball[0] > 795
+      @player_score = Gosu::Image.from_text(self, @pscore.to_s, Gosu.default_font_name, 45)
+      @computer_score = Gosu::Image.from_text(self, @cscore.to_s, Gosu.default_font_name, 45)
+      @pong_ball = [380, 280, 10]
     end
   end
 
