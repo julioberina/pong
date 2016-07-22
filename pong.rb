@@ -87,7 +87,12 @@ class GameWindow < Gosu::Window
     computer_ai
 
     # Initial and recurring ball movement
-    if @ball_v == [0, 0] then @ball_v = [-5, 0] end
+    if @ball_v == [0, 0]
+      angle = rand(241)
+      if angle >= 0 and angle < 120 then angle -= 60 end
+      @ball_v = [(5 * (cos(angle * Math::PI / 180.0))), (5 * (sin(angle * Math::PI / 180.0)))]
+    end
+
     2.times { |n| @pong_ball[n] += @ball_v[n] }
 
     # Ball-to-wall collision checking
