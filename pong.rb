@@ -139,8 +139,8 @@ class GameWindow < Gosu::Window
   end
 
   def draw
-    @player_score.draw(10.0, 10.0, 0) # Draw player score
-    @computer_score.draw(770.0, 10.0, 0) # Draw computer score
+    @player_score.draw(60.0, 10.0, 0) # Draw player score
+    @computer_score.draw(720.0, 10.0, 0) # Draw computer score
     draw_quad(@player_paddle[0], @player_paddle[1], Gosu::Color::WHITE,
               @player_paddle[2], @player_paddle[3], Gosu::Color::WHITE,
               @player_paddle[4], @player_paddle[5], Gosu::Color::WHITE,
