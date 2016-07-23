@@ -13,6 +13,10 @@ class Array # Add math operations for vectors
     self.length.times { |n| result << ((self[n] + vec[n]) / 2.0) }
     result
   end
+
+  def get_angle
+    atan((self[1] * -1) / self[0].to_f) * 180 / Math::PI
+  end
 end
 
 class GameWindow < Gosu::Window
@@ -91,6 +95,11 @@ class GameWindow < Gosu::Window
       angle = rand(241)
       if angle >= 0 and angle < 120 then angle -= 60 end
       @ball_v = [(5 * (cos(angle * Math::PI / 180.0))), (5 * (sin(angle * Math::PI / 180.0)))]
+    end
+
+    # Check for low magnitude vectors
+    if @ball_v != [0, 0] and @ball_v.magnitude < 5
+      @ball_v = [(5 * cos(@ball_v.get_angle)), (5 * sin(@ball_v.get_angle))]
     end
 
     2.times { |n| @pong_ball[n] += @ball_v[n] }
